@@ -1,0 +1,12 @@
+{
+  "name": "postman-newman-jenkins",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "api-test-production": "newman run Capa.postman_collection.json -e STG_SG_QA.postman_environment.json -d 'body_test_format.csv'"
+  },
+  "author": "",
+  "dependencies": {
+    "newman": "^5.3.2"
+  }
+}

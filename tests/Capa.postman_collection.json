@@ -1,0 +1,160 @@
+{
+	"info": {
+		"_postman_id": "7d089818-2a43-417d-a159-7f7828c5f1a8",
+		"name": "Capa",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20155345"
+	},
+	"item": [
+		{
+			"name": "email/cashin - body test format",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set('businessIdData', data.businessId)",
+							"pm.environment.set('transactionIdData', data.transactionId)",
+							"pm.environment.set('amountData', data.amount)",
+							"pm.environment.set('countryIdData', data.countryId)",
+							"pm.environment.set('currencyData', data.currency)",
+							"pm.environment.set('createdAtData', data.createdAt)",
+							"",
+							"function validateCode() {",
+							"    if (data.Code === 200 || data.Code === 400 || data.Code === 401 || data.Code === 403 ||",
+							"        data.Code === 403 || data.Code === 422 || data.Code === 500) {",
+							"        pm.variables.set('tkn', `${pm.variables.get('tokenCollection')}`)",
+							"    }",
+							"}",
+							"",
+							"try {",
+							"    validateCode()",
+							"} catch (err) {",
+							"    if (err instanceof TypeError) {",
+							"        console.log('New Error', err)",
+							"    } else {",
+							"        throw err",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							" var jsonData = pm.response.json()",
+							" const bodySend = JSON.parse(pm.request.body.raw)",
+							"",
+							"if(pm.response.code === 200){",
+							"    pm.test(\"Status code is\"+ data.Code, function () {",
+							"        pm.response.to.have.status(data.Code);",
+							"    });",
+							"    pm.test(\"Status code Name\", function () {",
+							"        pm.response.to.have.status(data.StatusResponse);",
+							"    });",
+							"    pm.test('validate json response format', function () {",
+							"        pm.response.to.be.json",
+							"    })",
+							"    pm.test(\"Validate body schema send\", function () {",
+							"        pm.expect(bodySend.businessId).to.be.a('number')",
+							"        pm.expect(bodySend.transactionId).to.be.a('string')",
+							"        pm.expect(bodySend.amount).to.be.a('number')",
+							"        pm.expect(bodySend.countryId).to.be.a('string')",
+							"        pm.expect(bodySend.currency).to.be.a('string')",
+							"        pm.expect(bodySend.createdAt).to.be.a('string') ",
+							"    });",
+							"    pm.test(\"Validate data response\", function () {",
+							"        pm.expect(jsonData.message).to.eql(data.Message_Response);",
+							"    });",
+							"    pm.test('Validate schema response', function () {",
+							"        pm.expect(jsonData.message).to.be.a('string')",
+							"    })",
+							"     pm.test('Validate content header', function () {",
+							"        pm.response.to.have.header('Content-Type')",
+							"        pm.response.to.have.header('X-Powered-By')",
+							"        pm.response.to.have.header('Content-Length')",
+							"        pm.response.to.have.header('Date')",
+							"    })",
+							"    // pm.test('Clear variables',function (){",
+							"    //     pm.environment.clear()",
+							"    // })",
+							"}",
+							"else if(pm.response.code === 400 || pm.response.code === 401 || pm.response.code === 403 || pm.response.code === 404 || pm.response.code === 422 ",
+							"|| pm.response.code=== 500){",
+							"    pm.test(\"Status code is \"+ data.Code, function () {",
+							"        pm.response.to.have.status(data.Code);",
+							"    });",
+							"    pm.test(\"Status code Name\", function () {",
+							"        pm.response.to.have.status(data.StatusResponse);",
+							"    });",
+							"    pm.test('validate json response format', function () {",
+							"        pm.response.to.be.json",
+							"    })",
+							"    pm.test(\"Validate data response\", function () {",
+							"        const myArray = jsonData.message.split(\"\\\"\");",
+							"        const  messagevalidate = myArray[1]+''+myArray[2]",
+							"        pm.expect(messagevalidate).to.contain(data.Message_Response);",
+							"        //pm.expect(jsonData.message).to.contain(data.Message_Response);",
+							"    });",
+							"    pm.test(\"Validate Error Code\", function () {",
+							"        pm.expect(jsonData.errorCode).to.eql(data.ErrorCode);",
+							"    });",
+							"//      pm.test('Clear variables',function (){",
+							"//         pm.environment.clear()",
+							"// })",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{tkn}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+						"key": "Authorization",
+						"value": "{{tkn}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"businessId\": {{businessIdData}},\n    \"transactionId\": {{transactionIdData}},\n    \"amount\": {{amountData}},\n    \"countryId\": {{countryIdData}},\n    \"currency\": {{currencyData}},\n    \"createdAt\": {{createdAtData}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL_ServerGlobal_MX}}/api/wallet/business/{{sg_mx_business_id}}/email/cashin",
+					"host": [
+						"{{URL_ServerGlobal_MX}}"
+					],
+					"path": [
+						"api",
+						"wallet",
+						"business",
+						"{{sg_mx_business_id}}",
+						"email",
+						"cashin"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
